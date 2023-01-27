@@ -1,7 +1,8 @@
 import http from "http"
 
 const server = http.createServer((req, res) => {
-    console.log(req.url)
+    
+    res.writeHead(200).end(req.url)
 })
 
 server.listen(() => {
