@@ -1,5 +1,6 @@
 import http from "http";
 
+console.log(process.env.PORT)
 const server = http.createServer((req, res) => {
   const path = req.url
   if(path === "/favicon.ico") {
@@ -9,7 +10,7 @@ const server = http.createServer((req, res) => {
   }
 });
 
-server.listen(() => {
+server.listen(process.env.PORT, () => {
   console.log("server started");
 });
 
