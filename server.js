@@ -1,7 +1,12 @@
 import http from "http";
 
 const server = http.createServer((req, res) => {
-  res.end('bye')
+  const path = req.url
+  if(path === "/favicon.ico") {
+    res.writeHead(200).end(Buffer.alloc(4, 1), 'base64')
+  }else {
+    res.writeHead(200).end("hello")
+  }
 });
 
 server.listen(() => {
