@@ -79,7 +79,7 @@ const fillProject = (field, files) => {
   let savedFilenames = ``
   files.forEach((fp, i) => {
     const extension = fp.split(".")[1];
-    savedFilenames += `<div class="imageDiv"><img src="https://portfolioserver-c6d2.onrender.com/projects/${field.name}/${i}.${extension}" alt="Can't load image" /></div>`
+    savedFilenames += `<div class="imageDiv"><img src="https://webserver.herokuapp.com/projects/${field.name}/${i}.${extension}" alt="Can't load image" /></div>`
   })
   return `<!DOCTYPE html>
   <html lang="en">
