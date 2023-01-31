@@ -100,4 +100,4 @@ const fillProject = (field, files) => {
   </html>`
 }
 
-export { getStack, formfieldParser, isFormField, parser, getProjects, fillProject };
+export { fillProject };

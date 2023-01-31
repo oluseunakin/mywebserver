@@ -1,5 +1,5 @@
 import http from "http";
-import { fillProject, getProjects, getStack } from "./helper.js";
+import { fillProject, getProjects } from "./helper.js";
 import { initializeApp } from "firebase/app";
 import { getDatabase, push, ref, onValue} from "firebase/database"
 import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage"
