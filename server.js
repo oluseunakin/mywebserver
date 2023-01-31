@@ -1,5 +1,5 @@
 import http from "http";
-import { fillProject, getProjects } from "./helper.js";
+import { fillProject } from "./helper.js";
 import { initializeApp } from "firebase/app";
 import { getDatabase, push, ref, onValue} from "firebase/database"
 import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage"
@@ -57,7 +57,7 @@ const server = http.createServer(async (req, res) => {
     res.end(pic);
   }  else if (path === "/getprojects") {
     
-    const projects = await getProjects(fieldbase);
+    //const projects = await getProjects(fieldbase);
     res.writeHead(200, { "Content-Type": "text/plain" }).end(projects);
   } else if (path.includes("project")) {
     const fieldpath = path.substring(9);
