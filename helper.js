@@ -1,10 +1,4 @@
-import { readFile, readdir } from "node:fs/promises";
-
-async function getStack() {
-  const path = "../projects/stack";
-  const data = await readFile(path, "utf-8");
-  return data;
-}
+import { readdir } from "node:fs/promises";
 
 const isFormField = (data) => {
   return data.includes("------WebKitFormBoundary");

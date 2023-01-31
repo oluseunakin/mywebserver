@@ -1,12 +1,29 @@
 import http from "http";
-import { readFile, writeFile, rename, mkdir, readdir } from "node:fs/promises";
 import { fillProject, getProjects, getStack } from "./helper.js";
+import { initializeApp } from "firebase/app";
+import { getDatabase, push, ref, onValue} from "firebase/database"
+import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage"
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBd_O6VnoJnMZqUoob0yFt9LujDH4mX2_0",
+  authDomain: "mywebserver-65685.firebaseapp.com",
+  projectId: "mywebserver-65685",
+  storageBucket: "mywebserver-65685.appspot.com",
+  messagingSenderId: "490803251890",
+  appId: "1:490803251890:web:b620aa1bf3ccdc287a57ab",
+  measurementId: "G-W9Q81KXD7C"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const database = getDatabase(app)
+const storage = getStorage()
+
+const projectRef = ref(database, '/projects')
 
 const server = http.createServer(async (req, res) => {
   const path = req.url ? decodeURIComponent(req.url) : "/";
   res.setHeader("access-control-allow-origin", "https://oluseunakin.github.io");
-  const fieldbase = "../projects/fields";
-  const filebase = "../projects/files";
 
   if (path === "/addproj") {
     const form = IncomingForm({ multiples: true, keepExtensions: true });
@@ -15,34 +32,31 @@ const server = http.createServer(async (req, res) => {
         res.statusCode = 401;
         res.end("Invalid data sent by user");
       }
-      writeFile(`${fieldbase}/${fields.name}.txt`, JSON.stringify(fields), {
-        flag: "w",
-      });
-      await mkdir(`${filebase}/${fields.name}`, { recursive: true });
+      push(projectRef, fields)
+      push(ref(database, 'stacks'), fields.tech)
       files.pics.forEach((pic, i) => {
-        const fp = pic.filepath;
-        const extension = fp.split(".")[1];
-        const pathname = `${filebase}/${fields.name}/${i}.${extension}`;
-        rename(fp, pathname);
+        const picRef = storageRef(storage, `${fields.name}/${pic.name}`)
+        uploadBytes(picRef, pic).then(file => {
+          console.log(file)  
+        })
       });
-      const filenames = await readdir(`${filebase}/${fields.name}`);
+      /* const filenames = await readdir(`${filebase}/${fields.name}`);
       res
         .writeHead(201, { "Content-Type": "text/html" })
-        .end(fillProject(fields, filenames));
+        .end(fillProject(fields, filenames)); */
     });
-  } else if (path === "/getstack") {
-    const data = await getStack();
+  } else if (path === "/getstack") { 
     res.setHeader("content-type", "application/json");
-    res.end(JSON.parse(data));
+    const stackRef = ref(database, '/stacks')
+    onValue(stackRef, snapshot => {
+      response.end(snapshot.val)
+    })
   } else if (path.includes("/projects")) {
     const slicedPath = path.slice(9);
     const pic = await readFile(`${filebase}/${slicedPath}`);
     res.end(pic);
-  } else if (path.includes("/css")) {
-    const decodedPath = path.slice(5);
-    const file = await readFile(`../css/${decodedPath}`, "utf-8");
-    res.end(file);
-  } else if (path === "/getprojects") {
+  }  else if (path === "/getprojects") {
+    
     const projects = await getProjects(fieldbase);
     res.writeHead(200, { "Content-Type": "text/plain" }).end(projects);
   } else if (path.includes("project")) {
@@ -71,6 +85,7 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(process.env.PORT, () => {
   console.log("server started");
+
 });
 
 server.on("error", (e) => {
