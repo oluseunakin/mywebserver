@@ -1,5 +1,3 @@
-import { readdir } from "node:fs/promises";
-
 const isFormField = (data) => {
   return data.includes("------WebKitFormBoundary");
 };
@@ -64,16 +62,11 @@ const formfieldParser = (data) => {
   return { fields, files };
 };
 
-const getProjects = async (path) => {
-  const files = await readdir(path)
-  return JSON.stringify(files)
-}
-
 const fillProject = (field, files) => {
   let savedFilenames = ``
-  files.forEach((fp, i) => {
-    const extension = fp.split(".")[1];
-    savedFilenames += `<div class="imageDiv"><img src="https://webserver.herokuapp.com/projects/${field.name}/${i}.${extension}" alt="Can't load image" /></div>`
+  files.forEach(async (url) => {
+    const u = url.value
+    savedFilenames += `<div class="imageDiv"><img src="${u}" alt="Can't load image" /></div>`
   })
   return `<!DOCTYPE html>
   <html lang="en">
@@ -81,8 +74,8 @@ const fillProject = (field, files) => {
       <meta charset="UTF-8">
       <meta http-equiv="X-UA-Compatible" content="IE=edge">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <link rel="stylesheet" href="../css/proj.css">
-      <link rel="stylesheet" href="../css/init.css" />
+      <link rel="stylesheet" href="https://oluseunakin.github.io/css/proj.css">
+      <link rel="stylesheet" href="https://oluseunakin.github.io/css/init.css" />
       <title>Document</title>
   </head>
   <body>
