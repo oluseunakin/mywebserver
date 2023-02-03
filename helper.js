@@ -79,16 +79,12 @@ const fillProject = (field, files) => {
       <title>Document</title>
   </head>
   <body>
-      <div>
-          <div>
-              <h1>${field.name}</h1>
-              <h2>${field.description}</h2>
-              <h4>${field.tech}</h4>
-          </div>
-          <div class="imageGrid">
-            ${savedFilenames}
-          </div>
-      </div>
+    <header>
+      <h1>${field.name}</h1>
+      <h4>${field.tech}</h4>
+      <h3>${field.description}</h3>
+    </header>
+    <main class="imageGrid"> ${savedFilenames} </main>
   </body>
   </html>`
 }
