@@ -82,7 +82,7 @@ const fillProject = (field, files) => {
     <header>
       <h1>${field.name}</h1>
       <h4>${field.tech}</h4>
-      <h3>${field.description}</h3>
+      <p>${field.description}</p>
     </header>
     <main class="imageGrid"> ${savedFilenames} </main>
   </body>
