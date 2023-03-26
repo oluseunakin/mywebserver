@@ -44,15 +44,19 @@ const server = http.createServer(async (req, res) => {
     form
       .on("file", (formname, file) => {
         readFile(file.filepath, async (err, data) => {
-          const smallbuf = await sharp(data).blur().toBuffer();
-          const smallresult = await uploadBytes(
-            storageRef(
-              storage,
-              `${title.replace(" ", "")}/small${file.originalFilename}`
-            ),
-            smallbuf,
-            { contentType: file.mimetype }
-          );
+          if (data.byteLength > 100000) {
+            const smallbuf = await sharp(data).blur().toBuffer();
+            const smallresult = await uploadBytes(
+              storageRef(
+                storage,
+                `${title.replace(" ", "")}/small${file.originalFilename}`
+              ),
+              smallbuf,
+              { contentType: file.mimetype }
+            );
+            smallfiles.push(smallresult.ref.fullPath);
+            fields["smallfiles"] = smallfiles;
+          }
           const result = await uploadBytes(
             storageRef(
               storage,
@@ -62,9 +66,7 @@ const server = http.createServer(async (req, res) => {
             { contentType: file.mimetype }
           );
           files.push(result.ref.fullPath);
-          smallfiles.push(smallresult.ref.fullPath);
           fields["files"] = files;
-          fields["smallfiles"] = smallfiles;
           Promise.allSettled([
             set(ref(database, "projects/" + title), fields),
             set(ref(database, "stack/" + title), tech),
@@ -75,10 +77,10 @@ const server = http.createServer(async (req, res) => {
         if (name === "name") title = value;
         if (name === "tech") tech = value.split(",");
         fields[name] = value;
-      })
-      req.on('end', () => {
-        res.end("data written");
-      })
+      });
+    req.on("end", () => {
+      res.end("data written");
+    });
   } else if (path === "/getstack") {
     res.setHeader("content-type", "application/json");
     const stackRef = ref(database, "stack");
