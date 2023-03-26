@@ -76,12 +76,9 @@ const server = http.createServer(async (req, res) => {
         if (name === "tech") tech = value.split(",");
         fields[name] = value;
       })
-      .on("end", () => {
+      req.on('end', () => {
         res.end("data written");
-        /* res
-          .writeHead(201, { "content-type": "text/html" })
-          .end(fillProject(fields, files)); */
-      });
+      })
   } else if (path === "/getstack") {
     res.setHeader("content-type", "application/json");
     const stackRef = ref(database, "stack");
