@@ -45,9 +45,7 @@ const server = http.createServer(async (req, res) => {
     form
       .on("file", (formname, file) => {
         readFile(file.filepath, async (err, data) => {
-          console.log(data.byteLength)
           const smallbuf = await sharp(data).resize(800, 700).toBuffer();
-          console.log(smallbuf.byteLength)
           const smallresult = await uploadBytes(
             storageRef(
               storage,
@@ -56,6 +54,7 @@ const server = http.createServer(async (req, res) => {
             smallbuf,
             { contentType: file.mimetype }
           );
+          console.log(smallresult)
           const result = await uploadBytes(
             storageRef(
               storage,
