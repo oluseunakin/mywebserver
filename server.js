@@ -45,7 +45,7 @@ const server = http.createServer(async (req, res) => {
       .on("file", (formname, file) => {
         readFile(file.filepath, async (err, data) => {
           if (data.byteLength > 100000) {
-            const smallbuf = await sharp(data).blur().toBuffer();
+            const smallbuf = await sharp(data).blur().flatten().toBuffer();
             const smallresult = await uploadBytes(
               storageRef(
                 storage,
