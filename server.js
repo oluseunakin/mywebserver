@@ -27,9 +27,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 const database = getDatabase(app);
-console.log(database)
+
 const storage = getStorage();
-const server = http.createServer(async (req, res) => {
+const server = http.createServer(async (req, res) => {console.log(database)
   const path = req.url ? decodeURIComponent(req.url) : "/";
   res.setHeader("access-control-allow-origin", "https://oluseunakin.github.io");
   //res.setHeader("access-control-allow-origin", "http://127.0.0.1:5500");
