@@ -10,10 +10,12 @@ import {
 } from "firebase/storage";
 import IncomingForm from "formidable";
 import { readFile } from "fs";
-import dotenv from 'dotenv'
+import * as dotenv from 'dotenv'
 import sharp from 'sharp'
 
+
 dotenv.config()
+
 const firebaseConfig = {
   apiKey: process.env.apiKey,
   authDomain: process.env.authDomain,
@@ -98,7 +100,7 @@ const server = http.createServer(async (req, res) => {console.log(database)
           .writeHead(200, { "Content-Type": "application/json" })
           .end(JSON.stringify(projects));
       } else res.end("no data");
-    });
+    }, (error) => {console.log(error)});
   } else if (path.includes("projects")) {
     onValue(
       ref(database, `projects/${path.substring(9)}`),
