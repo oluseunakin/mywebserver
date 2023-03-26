@@ -31,7 +31,7 @@ const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
 const storage = getStorage();
-const server = http.createServer(async (req, res) => {console.log(database)
+const server = http.createServer(async (req, res) => {
   const path = req.url ? decodeURIComponent(req.url) : "/";
   res.setHeader("access-control-allow-origin", "https://oluseunakin.github.io");
   //res.setHeader("access-control-allow-origin", "http://127.0.0.1:5500");
@@ -45,7 +45,9 @@ const server = http.createServer(async (req, res) => {console.log(database)
     form
       .on("file", (formname, file) => {
         readFile(file.filepath, async (err, data) => {
+          console.log(data.byteLength)
           const smallbuf = await sharp(data).resize(800, 700).toBuffer();
+          console.log(smallbuf.byteLength)
           const smallresult = await uploadBytes(
             storageRef(
               storage,
