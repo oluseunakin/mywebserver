@@ -27,6 +27,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 const database = getDatabase(app);
+console.log(database)
 const storage = getStorage();
 const server = http.createServer(async (req, res) => {
   const path = req.url ? decodeURIComponent(req.url) : "/";
