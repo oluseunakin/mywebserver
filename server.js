@@ -10,11 +10,10 @@ import {
 } from "firebase/storage";
 import IncomingForm from "formidable";
 import { readFile } from "fs";
-import * as dotenv from 'dotenv'
-import sharp from 'sharp'
+import * as dotenv from "dotenv";
+import sharp from "sharp";
 
-
-dotenv.config()
+dotenv.config();
 
 const firebaseConfig = {
   apiKey: process.env.apiKey,
@@ -45,7 +44,7 @@ const server = http.createServer(async (req, res) => {
     form
       .on("file", (formname, file) => {
         readFile(file.filepath, async (err, data) => {
-          const smallbuf = await sharp(data).resize(800, 700).toBuffer();
+          const smallbuf = await sharp(data).blur().toBuffer();
           const smallresult = await uploadBytes(
             storageRef(
               storage,
@@ -100,7 +99,7 @@ const server = http.createServer(async (req, res) => {
           .writeHead(200, { "Content-Type": "application/json" })
           .end(JSON.stringify(projects));
       } else res.end("no data");
-    }, (error) => {console.log(error)});
+    });
   } else if (path.includes("projects")) {
     onValue(
       ref(database, `projects/${path.substring(9)}`),
