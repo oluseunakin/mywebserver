@@ -5,13 +5,16 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.0.3",
     "firebase": "^9.16.0",
-    "formidable": "^3.2.5"
+    "formidable": "^3.2.5",
+    "sharp": "^0.31.3"
   }
 }

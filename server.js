@@ -10,15 +10,18 @@ import {
 } from "firebase/storage";
 import IncomingForm from "formidable";
 import { readFile } from "fs";
+import dotenv from 'dotenv'
+import sharp from 'sharp'
 
+dotenv.config()
 const firebaseConfig = {
-  apiKey: "AIzaSyBd_O6VnoJnMZqUoob0yFt9LujDH4mX2_0",
-  authDomain: "mywebserver-65685.firebaseapp.com",
-  projectId: "mywebserver-65685",
-  storageBucket: "mywebserver-65685.appspot.com",
-  messagingSenderId: "490803251890",
-  appId: "1:490803251890:web:b620aa1bf3ccdc287a57ab",
-  measurementId: "G-W9Q81KXD7C",
+  apiKey: process.env.apiKey,
+  authDomain: process.env.authDomain,
+  projectId: process.env.projectId,
+  storageBucket: process.env.storageBucket,
+  messagingSenderId: process.env.messagingSenderId,
+  appId: process.env.appId,
+  measurementId: process.env.measurementId,
 };
 
 const app = initializeApp(firebaseConfig);
@@ -34,28 +37,36 @@ const server = http.createServer(async (req, res) => {
     form.parse(req);
     const fields = {};
     const files = [];
+    const smallfiles = [];
     let title, tech;
     form
       .on("file", (formname, file) => {
-        readFile(file.filepath, (err, data) => {
-          uploadBytes(
+        readFile(file.filepath, async (err, data) => {
+          const smallbuf = await sharp(data).resize(800, 700).toBuffer();
+          const smallresult = await uploadBytes(
+            storageRef(
+              storage,
+              `${title.replace(" ", "")}/small${file.originalFilename}`
+            ),
+            smallbuf,
+            { contentType: file.mimetype }
+          );
+          const result = await uploadBytes(
             storageRef(
               storage,
               `${title.replace(" ", "")}/${file.originalFilename}`
             ),
             data,
             { contentType: file.mimetype }
-          )
-            .then((result) => {
-              files.push(result.ref.fullPath);
-            })
-            .finally(() => {
-              fields["files"] = files;
-              Promise.allSettled([
-                set(ref(database, "projects/" + title), fields),
-                set(ref(database, "stack/" + title), tech),
-              ]);
-            });
+          );
+          files.push(result.ref.fullPath);
+          smallfiles.push(smallresult.ref.fullPath);
+          fields["files"] = files;
+          fields["smallfiles"] = smallfiles;
+          Promise.allSettled([
+            set(ref(database, "projects/" + title), fields),
+            set(ref(database, "stack/" + title), tech),
+          ]);
         });
       })
       .on("field", (name, value) => {
@@ -92,7 +103,7 @@ const server = http.createServer(async (req, res) => {
       ref(database, `projects/${path.substring(9)}`),
       async (snapshot) => {
         const fields = snapshot.val();
-        let urls = fields.files.map(
+        let urls = fields.smallfiles.map(
           async (file) => await getDownloadURL(storageRef(storage, file))
         );
         urls = await Promise.allSettled(urls);
