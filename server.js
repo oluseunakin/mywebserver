@@ -76,6 +76,9 @@ const server = http.createServer(async (req, res) => {
       .on("field", (name, value) => {
         if (name === "name") title = value;
         if (name === "tech") tech = value.split(",");
+        if(name === 'link' && !value.startsWith("https")) {
+          value = `https://${encodeURIComponent(value)}`
+        }
         fields[name] = value;
       });
     req.on("end", () => {
