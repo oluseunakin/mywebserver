@@ -67,7 +67,6 @@ const fillProject = (field, urls, bigurls) => {
   urls.forEach(async (url, i) => {
     const u = url.value
     const big = bigurls[i].value
-    console.log(big)
     savedFilenames += `<a class="imageDiv" href=${big}><img src="${u}" alt="Can't load image" /></a>`
   })
   return `<!DOCTYPE html>
@@ -91,6 +90,9 @@ const fillProject = (field, urls, bigurls) => {
       </div>
     </header>
     <main class="imageGrid"> ${savedFilenames} </main>
+    <script>
+      alert("Images have been resized to save bandwidth, click to see more")
+    </script>
   </body>
   </html>`
 }
