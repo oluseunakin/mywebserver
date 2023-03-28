@@ -66,7 +66,9 @@ const fillProject = (field, urls, bigurls) => {
   let savedFilenames = ``
   urls.forEach(async (url, i) => {
     const u = url.value
-    savedFilenames += `<a class="imageDiv" href=${bigurls[i]}><img src="${u}" alt="Can't load image" /></a>`
+    const big = bigurls[i].value
+    console.log(big)
+    savedFilenames += `<a class="imageDiv" href=${big}><img src="${u}" alt="Can't load image" /></a>`
   })
   return `<!DOCTYPE html>
   <html lang="en">
