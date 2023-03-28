@@ -62,11 +62,11 @@ const formfieldParser = (data) => {
   return { fields, files };
 };
 
-const fillProject = (field, files) => {
+const fillProject = (field, urls, bigurls) => {
   let savedFilenames = ``
-  files.forEach(async (url) => {
+  urls.forEach(async (url, i) => {
     const u = url.value
-    savedFilenames += `<div class="imageDiv"><img src="${u}" alt="Can't load image" /></div>`
+    savedFilenames += `<a class="imageDiv" href=${bigurls[i]}><img src="${u}" alt="Can't load image" /></a>`
   })
   return `<!DOCTYPE html>
   <html lang="en">

@@ -45,7 +45,7 @@ const server = http.createServer(async (req, res) => {
       .on("file", (formname, file) => {
         readFile(file.filepath, async (err, data) => {
           if (data.byteLength > 100000) {
-            const smallbuf = await sharp(data).blur(1).toBuffer();
+            const smallbuf = await sharp(data).resize(200, 200).blur().toBuffer();
             const smallresult = await uploadBytes(
               storageRef(
                 storage,
@@ -110,10 +110,14 @@ const server = http.createServer(async (req, res) => {
         let urls = fields.smallfiles.map(
           async (file) => await getDownloadURL(storageRef(storage, file))
         );
+        let bigurls = fields.files.map(
+          async (file) => await getDownloadURL(storageRef(storage, file))
+        );
         urls = await Promise.allSettled(urls);
+        bigurls = await Promise.allSettled(bigurls)
         res
           .writeHead(200, { "Content-Type": "text/html" })
-          .end(fillProject(fields, urls));
+          .end(fillProject(fields, urls, bigurls));
       }
     );
   } else if (path === "/healthcheck") {
@@ -124,7 +128,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(process.env.PORT, () => {
-  console.log("server started ");
+  console.log("server started at "+ process.env.PORT);
 });
 
 server.on("error", (e) => {
