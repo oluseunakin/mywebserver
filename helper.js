@@ -76,7 +76,7 @@ const fillProject = (field, files) => {
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <link rel="stylesheet" href="https://oluseunakin.github.io/css/proj.css">
       <link rel="stylesheet" href="https://oluseunakin.github.io/css/init.css" />
-      <title>Document</title>
+      <title>${field.name}</title>
   </head>
   <body>
     <header>
