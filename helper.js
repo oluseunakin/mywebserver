@@ -81,10 +81,12 @@ const fillProject = (field, files) => {
   <body>
     <header>
       <a href="https://oluseunakin.github.io" class="home"></a>
-      <h1>${field.name}</h1>
-      <h4>${field.tech}</h4>
-      <p>${field.description}</p>
-      <a href=${field.link}>${field.link}</a>
+      <div>
+        <h1>${field.name}</h1>
+        <h4>${field.tech}</h4>
+        <p>${field.description}</p>
+        <a href=${field.link}>${field.link}</a>
+      </div>
     </header>
     <main class="imageGrid"> ${savedFilenames} </main>
   </body>
