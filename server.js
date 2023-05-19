@@ -1,7 +1,12 @@
 import http from "http";
 import { fillProject } from "./helper.js";
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, onValue, set } from "firebase/database";
+import {
+  getDatabase,
+  ref,
+  onValue,
+  set,
+} from "firebase/database";
 import {
   getDownloadURL,
   getStorage,
@@ -11,7 +16,7 @@ import {
 import IncomingForm from "formidable";
 import { readFile } from "fs";
 import * as dotenv from "dotenv";
-import sharp from "sharp";
+import * as sharp from "sharp";
 
 dotenv.config();
 
@@ -33,8 +38,9 @@ const storage = getStorage();
 const server = http.createServer(async (req, res) => {
   const path = req.url ? decodeURIComponent(req.url) : "/";
   res.setHeader("access-control-allow-origin", "https://oluseunakin.github.io");
-  //res.setHeader("access-control-allow-origin", "http://127.0.0.1:5500");
+  //res.setHeader("access-control-allow-origin", "http://127.0.0.1:5173");
   if (path === "/addproj") {
+    console.log('hi')
     const form = IncomingForm({ multiples: true, keepExtensions: true });
     form.parse(req);
     const fields = {};
@@ -45,7 +51,10 @@ const server = http.createServer(async (req, res) => {
       .on("file", (formname, file) => {
         readFile(file.filepath, async (err, data) => {
           if (data.byteLength > 100000) {
-            const smallbuf = await sharp(data).resize(200, 200).blur().toBuffer();
+            const smallbuf = await sharp(data)
+              .resize(200, 200)
+              .blur()
+              .toBuffer();
             const smallresult = await uploadBytes(
               storageRef(
                 storage,
@@ -67,21 +76,22 @@ const server = http.createServer(async (req, res) => {
           );
           files.push(result.ref.fullPath);
           fields["files"] = files;
-          Promise.allSettled([
-            set(ref(database, "projects/" + title), fields),
-            set(ref(database, "stack/" + title), tech),
-          ]);
+          
         });
       })
       .on("field", (name, value) => {
         if (name === "name") title = value;
         if (name === "tech") tech = value.split(",");
-        if(name === 'link' && !value.startsWith("https")) {
-          value = `https://${encodeURIComponent(value)}`
+        if (name === "link" && !value.startsWith("https")) {
+          value = `https://${encodeURIComponent(value)}`;
         }
         fields[name] = value;
       });
     req.on("end", () => {
+      Promise.allSettled([
+        set(ref(database, "projects/" + title), fields),
+        set(ref(database, "stack/" + title), tech),
+      ]);
       res.end("data written");
     });
   } else if (path === "/getstack") {
@@ -114,7 +124,7 @@ const server = http.createServer(async (req, res) => {
           async (file) => await getDownloadURL(storageRef(storage, file))
         );
         urls = await Promise.allSettled(urls);
-        bigurls = await Promise.allSettled(bigurls)
+        bigurls = await Promise.allSettled(bigurls);
         res
           .writeHead(200, { "Content-Type": "text/html" })
           .end(fillProject(fields, urls, bigurls));
@@ -128,7 +138,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(process.env.PORT, () => {
-  console.log("server started at "+ process.env.PORT);
+  console.log("server started at " + process.env.PORT);
 });
 
 server.on("error", (e) => {
