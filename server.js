@@ -32,8 +32,8 @@ const database = getDatabase(app);
 const storage = getStorage();
 const server = http.createServer(async (req, res) => {
   const path = req.url ? decodeURIComponent(req.url) : "/";
-  //res.setHeader("access-control-allow-origin", "https://oluseunakin.github.io");
-  res.setHeader("access-control-allow-origin", "http://127.0.0.1:5500");
+  res.setHeader("access-control-allow-origin", "https://oluseunakin.github.io");
+  //res.setHeader("access-control-allow-origin", "http://127.0.0.1:5500");
   if (path === "/addproj") {
     const form = IncomingForm({ multiples: true, keepExtensions: true });
     form.parse(req);
@@ -66,15 +66,13 @@ const server = http.createServer(async (req, res) => {
         }
         fields[name] = value;
       })
-      .on("progress", (received, expected) => {
-        if (received === expected) {
-          Promise.allSettled([
+      req.on("end", () => {
+        Promise.allSettled([
             set(ref(database, "projects/" + title), fields),
             set(ref(database, "stack/" + title), tech),
           ]);
           res.end("data written");
-        }
-      });
+      })
   } else if (path === "/getstack") {
     res.setHeader("content-type", "application/json");
     const stackRef = ref(database, "stack");
