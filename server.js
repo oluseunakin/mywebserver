@@ -1,12 +1,7 @@
 import http from "http";
 import { fillProject } from "./helper.js";
 import { initializeApp } from "firebase/app";
-import {
-  getDatabase,
-  ref,
-  onValue,
-  set,
-} from "firebase/database";
+import { getDatabase, ref, onValue, set } from "firebase/database";
 import {
   getDownloadURL,
   getStorage,
@@ -37,35 +32,17 @@ const database = getDatabase(app);
 const storage = getStorage();
 const server = http.createServer(async (req, res) => {
   const path = req.url ? decodeURIComponent(req.url) : "/";
-  res.setHeader("access-control-allow-origin", "https://oluseunakin.github.io");
-  //res.setHeader("access-control-allow-origin", "http://127.0.0.1:5173");
+  //res.setHeader("access-control-allow-origin", "https://oluseunakin.github.io");
+  res.setHeader("access-control-allow-origin", "http://127.0.0.1:5500");
   if (path === "/addproj") {
-    console.log('hi')
     const form = IncomingForm({ multiples: true, keepExtensions: true });
     form.parse(req);
     const fields = {};
     const files = [];
-    const smallfiles = [];
     let title, tech;
     form
       .on("file", (formname, file) => {
         readFile(file.filepath, async (err, data) => {
-          if (data.byteLength > 100000) {
-            const smallbuf = await sharp(data)
-              .resize(200, 200)
-              .blur()
-              .toBuffer();
-            const smallresult = await uploadBytes(
-              storageRef(
-                storage,
-                `${title.replace(" ", "")}/small${file.originalFilename}`
-              ),
-              smallbuf,
-              { contentType: file.mimetype }
-            );
-            smallfiles.push(smallresult.ref.fullPath);
-            fields["smallfiles"] = smallfiles;
-          }
           const result = await uploadBytes(
             storageRef(
               storage,
@@ -74,9 +51,11 @@ const server = http.createServer(async (req, res) => {
             data,
             { contentType: file.mimetype }
           );
-          files.push(result.ref.fullPath);
+          const url = await getDownloadURL(
+            storageRef(storage, result.ref.fullPath)
+          );
+          files.push(url);
           fields["files"] = files;
-          
         });
       })
       .on("field", (name, value) => {
@@ -86,14 +65,16 @@ const server = http.createServer(async (req, res) => {
           value = `https://${encodeURIComponent(value)}`;
         }
         fields[name] = value;
+      })
+      .on("progress", (received, expected) => {
+        if (received === expected) {
+          Promise.allSettled([
+            set(ref(database, "projects/" + title), fields),
+            set(ref(database, "stack/" + title), tech),
+          ]);
+          res.end("data written");
+        }
       });
-    req.on("end", () => {
-      Promise.allSettled([
-        set(ref(database, "projects/" + title), fields),
-        set(ref(database, "stack/" + title), tech),
-      ]);
-      res.end("data written");
-    });
   } else if (path === "/getstack") {
     res.setHeader("content-type", "application/json");
     const stackRef = ref(database, "stack");
